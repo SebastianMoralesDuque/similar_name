@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const register = async (email, username, password) => {
   try {
@@ -9,17 +12,31 @@ const register = async (email, username, password) => {
     });
 
     const data = response.data;
-    // Aquí puedes manejar la respuesta del registro
-
-    // Si el registro es exitoso (código de estado 2xx), puedes realizar alguna acción adicional
-    if (response.status >= 200 && response.status < 300) {
-      // Realiza las acciones adicionales necesarias después del registro exitoso
+    
+    if (response.status === 201) {
+      toast.success('Successful registration',{
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+    
       console.log('Registro exitoso:', data.message);
     } else {
-      // Aquí puedes manejar el caso de error en el registro
-      console.error('Error en el registro:', data.error);
+      let errorMessage = '';
+
+      if (data.email && data.email.length > 0) {
+        errorMessage = data.email[0];
+      } else if (data.username && data.username.length > 0) {
+        errorMessage = data.username[0];
+      }
+
+      toast.error(errorMessage,{
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+      console.error('Error en el registro:', errorMessage);
     }
   } catch (error) {
+    toast.error('Error: ' + error.message,{
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
     console.error('Error:', error);
   }
 };
@@ -32,19 +49,47 @@ const login = async (email, password) => {
     });
 
     const data = response.data;
-    // Aquí puedes manejar la respuesta del inicio de sesión
 
-    // Si el inicio de sesión es exitoso (código de estado 2xx), retorna los datos del usuario
-    console.log(data.access);
     if (response.status >= 200 && response.status < 300) {
+      toast.success('Successful login',{
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
       return {
         user: data.username,
         accessToken: data.access,
         refreshToken: data.refresh,
       };
     } else {
-      // Aquí puedes manejar el caso de error en el inicio de sesión
-      console.error('Error en el inicio de sesión:', data.error);
+      const errorMessage = data.error ? 'Incorrect email or password' : 'Error in login';
+      toast.error(errorMessage,{
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+      console.error('Error in login:', errorMessage);
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    toast.error('Error: ' + 'Incorrect email or password',{
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+
+const refreshTokenFunc = async (refreshToken) => {
+  try {
+    const response = await axios.post('http://localhost:8000/token-refresh/', {
+      refresh: refreshToken
+    });
+
+    const data = response.data;
+
+    if (response.status >= 200 && response.status < 300) {
+      return {
+        access: data.access,
+      };
+    } else {
       throw new Error(data.error);
     }
   } catch (error) {
@@ -53,4 +98,4 @@ const login = async (email, password) => {
   }
 };
 
-export { register, login };
+export { register, login, refreshTokenFunc };

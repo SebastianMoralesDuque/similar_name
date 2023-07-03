@@ -12,7 +12,7 @@ class UserRegistrationView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({'message': 'Usuario registrado exitosamente'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors)
 
 class UserLoginView(TokenObtainPairView):
     serializer_class = UserLoginSerializer

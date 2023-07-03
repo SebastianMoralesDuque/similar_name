@@ -13,15 +13,15 @@ const Formulario = ({ token }) => {
     event.preventDefault();
 
     if (!token) {
-      toast.error('Debes iniciar sesión antes de enviar los datos', {
-        position: toast.POSITION.TOP_CENTER
+      toast.error('Log in first', {
+        position: toast.POSITION.BOTTOM_RIGHT,
       });
       return;
     }
 
     if (!name || !percentage) {
-      toast.error('Por favor, completa todos los campos', {
-        position: toast.POSITION.TOP_CENTER
+      toast.error('Please fill in all the fields', {
+        position: toast.POSITION.BOTTOM_RIGHT,
       });
       return;
     }

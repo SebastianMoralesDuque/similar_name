@@ -16,7 +16,7 @@ const sendData = async (name, percentage, token) => {
     return response.data; // Retorna la respuesta JSON
   } catch (error) {
     console.error('Error:', error);
-    throw error; // Lanza el error para que pueda ser manejado en el componente
+    throw error;
   }
 };
 

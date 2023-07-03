@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import { register, login } from '../api/auth';
 import { AuthProvider } from './AuthContext';
 import Formulario from './Form';
+import TokenRefresher from './TokenRefresher';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -41,7 +42,7 @@ function App() {
   const handleRegister = async (event) => {
     event.preventDefault();
     const { email, username, password } = event.target.elements;
-  
+
     try {
       await register(email.value, username.value, password.value);
       handleModalClose();
@@ -49,29 +50,61 @@ function App() {
       console.error('Error:', error);
     }
   };
-  
-  const handleAuthenticated = (user, accessToken, refreshToken) => {
-    setLoggedIn(true);
-    setUsername(user);
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
-  };
 
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
     const { email, password } = event.target.elements;
-  
     try {
       const { user, accessToken, refreshToken } = await login(email.value, password.value);
-      handleAuthenticated(user, accessToken, refreshToken);
+      setLoggedIn(true);
+      setUsername(user);
+      setAccessToken(accessToken);
+      setRefreshToken(refreshToken);
+      localStorage.setItem('accessTokenExpiration', decodeAccessToken(accessToken).exp * 1000);
       handleModalClose();
     } catch (error) {
-      // Aquí puedes manejar el caso de error en el inicio de sesión
       console.error('Error en el inicio de sesión:', error.message);
-      console.log(error); // Agrega un console.log para mostrar el objeto de error completo
+      console.log(error); 
     }
   };
-  
+
+  const decodeAccessToken = (token) => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  };
+
+  useEffect(() => {
+    let intervalId;
+
+    const checkTokenExpiration = () => {
+      const expirationTime = localStorage.getItem('accessTokenExpiration');
+      const timeToExpiration = expirationTime - new Date().getTime();
+      const refreshThreshold = 60000;
+
+      if (timeToExpiration <= refreshThreshold) {
+        TokenRefresher(refreshToken, setAccessToken, handleLogout);
+      }
+    };
+
+    const startTokenExpirationCheck = () => {
+      intervalId = setInterval(checkTokenExpiration, 5000);
+    };
+
+    if (loggedIn) {
+      startTokenExpirationCheck();
+    }
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [loggedIn, refreshToken, handleLogout]);
 
   return (
     <div>
@@ -79,7 +112,7 @@ function App() {
         <Navbar
           loggedIn={loggedIn}
           username={username}
-          handleLogout={handleLogout} // Asegúrate de pasar la función handleLogout como prop
+          handleLogout={handleLogout}
           handleLoginModalOpen={handleLoginModalOpen}
           handleRegisterModalOpen={handleRegisterModalOpen}
         />

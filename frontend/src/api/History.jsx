@@ -43,7 +43,11 @@ const ObtenerResultados = ({ id }) => {
         <p className="text-lg">Porcentaje buscado: {resultados.porcentaje}</p>
         <p className="text-lg">Registros: {resultados.estado}</p>
       </div>
-      <Tabla resultados={resultados.resultados} />
+      {resultados.resultados.length > 0 ? (
+        <Tabla resultados={resultados.resultados} />
+      ) : (
+        <p></p>
+      )}
     </div>
   ) : null;
 };

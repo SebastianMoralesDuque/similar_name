@@ -96,6 +96,8 @@ const Formulario = ({ token }) => {
         <div className="mt-4">
           <Tabla resultados={resultados} />
         </div>
+      ) : hasSearched && resultados.length === 0 ? (
+        <p className="mt-4 text-gray-700">Sin resultados</p>
       ) : null}
 
       <ToastContainer />

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Navbar = ({ loggedIn, username, handleLoginModalOpen, handleRegisterModalOpen, handleLogout }) => {
-  const handleHomeClick = (event) => {
+  const handleHistoryClick = (event) => {
     event.preventDefault();
   };
 
@@ -13,20 +13,21 @@ const Navbar = ({ loggedIn, username, handleLoginModalOpen, handleRegisterModalO
   return (
     <nav className="flex items-center justify-between bg-gray-800 p-6 shadow">
       <div className="flex items-center">
-        <a href="/" className="text-white font-semibold hover:text-gray-200" onClick={handleHomeClick}>
+        <a href="/Prueba" className="text-white font-semibold hover:text-gray-200" onClick={handleHistoryClick}>
           Home
         </a>
       </div>
       <div className="flex items-center">
         {loggedIn ? (
           <>
-            <span className="text-white mr-2">Hola, {username}</span>
+            <span className="text-white">Hola, {username}</span>
             <button
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded ml-4"
               onClick={handleLogoutClick}
             >
               Cerrar sesión
             </button>
+
           </>
         ) : (
           <>

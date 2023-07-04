@@ -3,11 +3,14 @@ import { sendData } from '../api/Data';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Tabla from './Table';
+import { CSVLink } from 'react-csv';
 
 const Formulario = ({ token }) => {
   const [name, setName] = useState('');
   const [percentage, setPercentage] = useState('');
   const [resultados, setResultados] = useState([]);
+  const [exportData, setExportData] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,6 +32,8 @@ const Formulario = ({ token }) => {
     try {
       const response = await sendData(name, percentage, token);
       setResultados(response);
+      setExportData(response);
+      setHasSearched(true);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -74,23 +79,24 @@ const Formulario = ({ token }) => {
           >
             Buscar
           </button>
-          <button
-            type="button"
-            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mt-4 md:mt-0 md:ml-2"
-          >
-            Exportar
-          </button>
+          {resultados.length > 0 && (
+            <CSVLink
+              data={exportData}
+              filename="resultados.csv"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mt-4 md:mt-0 md:ml-2"
+            >
+              Exportar
+            </CSVLink>
+          )}
         </div>
       </form>
 
       {/* Tabla de resultados */}
-      {resultados.length > 0 ? (
+      {hasSearched && resultados.length > 0 ? (
         <div className="mt-4">
           <Tabla resultados={resultados} />
         </div>
-      ) : (
-        <p className="mt-4 text-gray-700">Sin resultados</p>
-      )}
+      ) : null}
 
       <ToastContainer />
     </div>

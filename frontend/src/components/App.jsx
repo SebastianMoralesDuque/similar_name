@@ -3,9 +3,9 @@ import Navbar from './Navbar';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import { register, login } from '../api/auth';
-import { AuthProvider } from './AuthContext';
 import Formulario from './Form';
 import TokenRefresher from './TokenRefresher';
+import HistoryForm from './HistoryForm';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -15,6 +15,7 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showHistoryForm, setShowHistoryForm] = useState(false);
 
   const handleLogout = () => {
     setLoggedIn(false);
@@ -64,7 +65,7 @@ function App() {
       handleModalClose();
     } catch (error) {
       console.error('Error en el inicio de sesión:', error.message);
-      console.log(error); 
+      console.log(error);
     }
   };
 
@@ -78,6 +79,10 @@ function App() {
         .join('')
     );
     return JSON.parse(jsonPayload);
+  };
+
+  const handleConsultarClick = () => {
+    setShowHistoryForm(true);
   };
 
   useEffect(() => {
@@ -106,29 +111,38 @@ function App() {
     };
   }, [loggedIn, refreshToken, handleLogout]);
 
+
   return (
     <div>
-      <AuthProvider>
-        <Navbar
-          loggedIn={loggedIn}
-          username={username}
-          handleLogout={handleLogout}
-          handleLoginModalOpen={handleLoginModalOpen}
-          handleRegisterModalOpen={handleRegisterModalOpen}
-        />
+      <Navbar
+        loggedIn={loggedIn}
+        username={username}
+        handleLogout={handleLogout}
+        handleLoginModalOpen={handleLoginModalOpen}
+        handleRegisterModalOpen={handleRegisterModalOpen}
+      />
 
-        {showModal && (
-          <div className="modal">
-            {showLoginModal && (
-              <LoginModal handleLoginSubmit={handleLoginSubmit} handleModalClose={handleModalClose} />
-            )}
-            {showRegisterModal && (
-              <RegisterModal handleRegister={handleRegister} handleModalClose={handleModalClose} />
-            )}
-          </div>
-        )}
+      {showModal && (
+        <div className="modal">
+          {showLoginModal && <LoginModal handleLoginSubmit={handleLoginSubmit} handleModalClose={handleModalClose} />}
+          {showRegisterModal && (
+            <RegisterModal handleRegister={handleRegister} handleModalClose={handleModalClose} />
+          )}
+        </div>
+      )}
+
+       <div className="space-y-12">
         <Formulario token={accessToken} />
-      </AuthProvider>
+        {!showHistoryForm && (
+          <button
+            className="block mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleConsultarClick}
+          >
+            Consultar Historial
+          </button>
+        )}
+        {showHistoryForm && <HistoryForm />}
+      </div>
     </div>
   );
 }

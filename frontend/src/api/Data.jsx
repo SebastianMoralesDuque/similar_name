@@ -1,9 +1,11 @@
 import axios from 'axios';
 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 const sendData = async (name, percentage, token) => {
   try {
     const response = await axios.post(
-      'http://localhost:8000/data/buscar-datos/',
+      `${backendURL}/data/buscar-datos/`,
       { name, percentage },
       {
         headers: {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Tabla from '../components/Table';
 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 const ObtenerResultados = ({ id }) => {
   const [resultados, setResultados] = useState(null);
   const [noHistorial, setNoHistorial] = useState(false);
@@ -9,7 +11,7 @@ const ObtenerResultados = ({ id }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/data/obtener-resultados/${id}/`);
+        const response = await axios.get(`${backendURL}/data/obtener-resultados/${id}/`);
         const data = response.data;
         data.resultados = JSON.parse(data.resultados);
         setResultados(data);

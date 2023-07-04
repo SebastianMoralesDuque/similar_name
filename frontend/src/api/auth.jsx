@@ -2,10 +2,11 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const register = async (email, username, password) => {
   try {
-    const response = await axios.post('http://localhost:8000/register/', {
+    const response = await axios.post(`${backendURL}/register/`, {
       email,
       username,
       password,
@@ -14,7 +15,7 @@ const register = async (email, username, password) => {
     const data = response.data;
     
     if (response.status === 201) {
-      toast.success('Successful registration',{
+      toast.success('Successful registration', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
     
@@ -28,13 +29,13 @@ const register = async (email, username, password) => {
         errorMessage = data.username[0];
       }
 
-      toast.error(errorMessage,{
+      toast.error(errorMessage, {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
       console.error('Error en el registro:', errorMessage);
     }
   } catch (error) {
-    toast.error('Error: ' + error.message,{
+    toast.error('Error: ' + error.message, {
       position: toast.POSITION.BOTTOM_RIGHT,
     });
     console.error('Error:', error);
@@ -43,7 +44,7 @@ const register = async (email, username, password) => {
 
 const login = async (email, password) => {
   try {
-    const response = await axios.post('http://localhost:8000/login/', {
+    const response = await axios.post(`${backendURL}/login/`, {
       email,
       password,
     });
@@ -51,7 +52,7 @@ const login = async (email, password) => {
     const data = response.data;
 
     if (response.status >= 200 && response.status < 300) {
-      toast.success('Successful login',{
+      toast.success('Successful login', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
       return {
@@ -61,14 +62,14 @@ const login = async (email, password) => {
       };
     } else {
       const errorMessage = data.error ? 'Incorrect email or password' : 'Error in login';
-      toast.error(errorMessage,{
+      toast.error(errorMessage, {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
       console.error('Error in login:', errorMessage);
       throw new Error(errorMessage);
     }
   } catch (error) {
-    toast.error('Error: ' + 'Incorrect email or password',{
+    toast.error('Error: ' + 'Incorrect email or password', {
       position: toast.POSITION.BOTTOM_RIGHT,
     });
     console.error('Error:', error);
@@ -79,7 +80,7 @@ const login = async (email, password) => {
 
 const refreshTokenFunc = async (refreshToken) => {
   try {
-    const response = await axios.post('http://localhost:8000/token-refresh/', {
+    const response = await axios.post(`${backendURL}/token-refresh/`, {
       refresh: refreshToken
     });
 
